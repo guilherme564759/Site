@@ -1,11 +1,136 @@
+:root {
+  --bg: #020c12;
+  --bg2: #04151f;
+  --panel: #092f44;
+  --panel2: #061c2b;
+  --ocean: #062d3d;
+  --accent: #0b6b8a;
+  --green: #1faa59;
+  --text: #eef8fb;
+  --muted: #9fc0cc;
+  --danger: #d94848;
+  --success: #2fc26b;
+  --border: rgba(255,255,255,.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg, #01090f, #02131f);
+  color: var(--text);
+}
+
+/* HEADER */
+.topbar {
+  background: linear-gradient(90deg, #04151f, #062d3d);
+  border-bottom: 2px solid var(--accent);
+  padding: 15px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+h1 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.topbar p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* BOTÃO MANAGER */
+.nav-link {
+  text-decoration: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+}
+
+/* HOME */
+.hero {
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-card {
+  background: linear-gradient(145deg, var(--panel), var(--panel2));
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  border: 1px solid var(--border);
+  width: 500px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.badge {
+  background: rgba(11,107,138,0.2);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  color: #9decff;
+}
+
+.hero-card h2 {
+  font-size: 28px;
+  margin: 15px 0;
+}
+
+.hero-card p {
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+/* BOTÃO PRINCIPAL */
+.btn-primary {
+  background: var(--green);
+  padding: 12px 25px;
+  border-radius: 10px;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-block;
+  transition: 0.2s;
+  border: none;
+}
+
+.btn-primary:hover {
+  background: #168f47;
+  transform: scale(1.05);
+}
+
+/* PÁGINA */
 .page {
   padding: 35px;
   display: flex;
   justify-content: center;
 }
 
+/* PAINEL */
 .panel {
-  background: linear-gradient(145deg, #092f44, #061c2b);
+  background: linear-gradient(145deg, var(--panel), var(--panel2));
   border: 1px solid rgba(0, 174, 255, 0.25);
   border-radius: 22px;
   padding: 30px;
@@ -13,6 +138,7 @@
   box-shadow: 0 20px 60px rgba(0,0,0,0.45);
 }
 
+/* FORMULÁRIO */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -30,6 +156,7 @@ label {
   font-size: 14px;
 }
 
+/* INPUTS */
 input, select, textarea {
   background: #02131f;
   color: white;
@@ -54,6 +181,7 @@ textarea {
   grid-column: 1 / -1;
 }
 
+/* ALERTA */
 .success {
   background: rgba(31,170,89,0.15);
   border: 1px solid #1faa59;
@@ -62,6 +190,7 @@ textarea {
   margin-top: 15px;
 }
 
+/* RESPONSIVO */
 @media (max-width: 800px) {
   .form-grid {
     grid-template-columns: 1fr;
