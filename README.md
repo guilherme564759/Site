@@ -1,17 +1,16 @@
-# Sistema RSO Profissional
+# Sistema RSO com Login Policial
 
-## Login padrão do Manager
+## Login do Manager
 Usuário: `Administrador`
 Senha: `admin123`
 
 ## Novidades
-- Botão `Ver meus RSO` ao lado de `[+ Iniciar RSO]`
-- Após enviar RSO, volta para a tela inicial
-- Painel Manager mais profissional e arredondado
-- Aba de aprovados, recusados e pendentes
-- Cálculo de horas pelo horário de início e saída
-- Tela de horas somadas por quem enviou o relatório
-- Consulta pública dos próprios RSOs por nome
+- Login/cadastro do policial
+- Campo “Nome de quem envia” removido
+- RSO fica vinculado à conta logada
+- Cada policial vê somente seus próprios RSOs
+- Horários alinhados corretamente no formulário
+- Soma de horas só dos RSOs aprovados
 
 ## Rodar
 ```bash
@@ -19,7 +18,7 @@ npm install
 npm start
 ```
 
-## Railway / Render
+## Railway
 Start Command:
 ```bash
 npm start

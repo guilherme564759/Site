@@ -15,7 +15,16 @@
       <p>Sistema de Relatório de Serviço Operacional</p>
     </div>
   </div>
-  <a class="nav-link" href="/manager/login">Manager</a>
+  <nav class="nav">
+    <% if (user) { %>
+      <a class="pill-link" href="/meus-rso">Meus RSO</a>
+      <a class="pill-link" href="/logout">Sair</a>
+    <% } else { %>
+      <a class="pill-link" href="/login">Login Policial</a>
+      <a class="pill-link" href="/cadastro">Cadastrar</a>
+    <% } %>
+    <a class="pill-link" href="/manager/login">Manager</a>
+  </nav>
 </header>
 
 <main class="hero">
@@ -23,6 +32,10 @@
     <span class="badge">R.S.O DIGITAL</span>
     <h2>Relatório de Serviço Operacional</h2>
     <p>Registre, acompanhe e consulte os relatórios operacionais com segurança e organização.</p>
+
+    <% if (user) { %>
+      <div class="user-box">Policial logado: <strong><%= user.nome %></strong></div>
+    <% } %>
 
     <% if (enviado) { %>
       <div class="success">✅ RSO enviado com sucesso para análise do Manager.</div>

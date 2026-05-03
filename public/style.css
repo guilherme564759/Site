@@ -224,6 +224,14 @@ textarea { min-height: 160px; resize: vertical; }
   margin-top: 15px;
 }
 
+.error {
+  background: rgba(217,72,72,0.14);
+  border: 1px solid rgba(217,72,72,0.55);
+  padding: 13px 15px;
+  border-radius: 18px;
+  margin-top: 15px;
+}
+
 .cards { display: grid; gap: 18px; margin-top: 16px; }
 .rso-card {
   background: rgba(2, 19, 31, 0.66);
@@ -313,6 +321,14 @@ textarea { min-height: 160px; resize: vertical; }
   border: 1px solid rgba(0,174,255,.18);
   border-radius: 22px;
   padding: 16px;
+}
+
+.user-box {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--muted);
+  margin-bottom: 15px;
 }
 
 @media (max-width: 900px) {

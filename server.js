@@ -48,8 +48,19 @@ function formatarHoras(valor) {
 
 db.serialize(() => {
   db.run(`
+    CREATE TABLE IF NOT EXISTS usuarios (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nome TEXT NOT NULL UNIQUE,
+      senha TEXT NOT NULL,
+      patente TEXT,
+      criado_em TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  db.run(`
     CREATE TABLE IF NOT EXISTS relatorios (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      usuario_id INTEGER,
       nome_envio TEXT NOT NULL,
       prefixo TEXT NOT NULL,
       unidade TEXT NOT NULL,
@@ -78,25 +89,23 @@ db.serialize(() => {
     )
   `);
 
-  // Migração simples caso venha de versão antiga
-  const cols = [
-    ["nome_envio", "TEXT DEFAULT 'Não informado'"],
-    ["motorista", "TEXT"],
-    ["encarregado", "TEXT"],
-    ["terceiro", "TEXT"],
-    ["quarto", "TEXT"],
-    ["hora_inicio", "TEXT"],
-    ["hora_saida", "TEXT"],
-    ["horas_total", "REAL DEFAULT 0"]
-  ];
-
   db.all("PRAGMA table_info(relatorios)", (err, rows) => {
     if (!err && rows) {
       const existentes = rows.map(r => r.name);
+      const cols = [
+        ["usuario_id", "INTEGER"],
+        ["nome_envio", "TEXT DEFAULT 'Não informado'"],
+        ["motorista", "TEXT"],
+        ["encarregado", "TEXT"],
+        ["terceiro", "TEXT"],
+        ["quarto", "TEXT"],
+        ["hora_inicio", "TEXT"],
+        ["hora_saida", "TEXT"],
+        ["horas_total", "REAL DEFAULT 0"]
+      ];
+
       cols.forEach(([nome, tipo]) => {
-        if (!existentes.includes(nome)) {
-          db.run(`ALTER TABLE relatorios ADD COLUMN ${nome} ${tipo}`);
-        }
+        if (!existentes.includes(nome)) db.run(`ALTER TABLE relatorios ADD COLUMN ${nome} ${tipo}`);
       });
     }
   });
@@ -119,6 +128,11 @@ app.use(session({
   saveUninitialized: false
 }));
 
+function requireUser(req, res, next) {
+  if (!req.session.user) return res.redirect("/login");
+  next();
+}
+
 function requireManager(req, res, next) {
   if (!req.session.manager) return res.redirect("/manager/login");
   next();
@@ -136,14 +150,64 @@ function dbRun(sql, params = []) {
 
 app.locals.formatarHoras = formatarHoras;
 
-app.get("/", (req, res) => res.render("home", { enviado: req.query.enviado === "1" }));
+app.get("/", (req, res) => {
+  res.render("home", {
+    enviado: req.query.enviado === "1",
+    user: req.session.user || null
+  });
+});
 
-app.get("/novo-rso", (req, res) => res.render("novo-rso"));
+app.get("/cadastro", (req, res) => {
+  res.render("cadastro", { erro: null, user: req.session.user || null });
+});
 
-app.post("/novo-rso", async (req, res) => {
+app.post("/cadastro", async (req, res) => {
+  try {
+    const { nome, senha, patente } = req.body;
+
+    if (!nome || !senha) {
+      return res.render("cadastro", { erro: "Preencha nome e senha.", user: null });
+    }
+
+    await dbRun("INSERT INTO usuarios (nome, senha, patente) VALUES (?, ?, ?)", [nome.trim(), senha.trim(), patente || ""]);
+    res.redirect("/login");
+  } catch (err) {
+    console.error(err);
+    res.render("cadastro", { erro: "Esse nome já existe. Escolha outro.", user: null });
+  }
+});
+
+app.get("/login", (req, res) => {
+  res.render("login-user", { erro: null, user: req.session.user || null });
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    const { nome, senha } = req.body;
+    const user = await dbGet("SELECT * FROM usuarios WHERE nome = ? AND senha = ?", [nome.trim(), senha.trim()]);
+
+    if (!user) return res.render("login-user", { erro: "Nome ou senha incorretos.", user: null });
+
+    req.session.user = { id: user.id, nome: user.nome, patente: user.patente };
+    res.redirect("/");
+  } catch (err) {
+    console.error(err);
+    res.render("login-user", { erro: "Erro ao entrar.", user: null });
+  }
+});
+
+app.get("/logout", (req, res) => {
+  req.session.destroy(() => res.redirect("/"));
+});
+
+app.get("/novo-rso", requireUser, (req, res) => {
+  res.render("novo-rso", { user: req.session.user });
+});
+
+app.post("/novo-rso", requireUser, async (req, res) => {
   try {
     const {
-      nome_envio, prefixo, unidade, motorista, encarregado,
+      prefixo, unidade, motorista, encarregado,
       terceiro, quarto, hora_inicio, hora_saida, relato, material
     } = req.body;
 
@@ -151,10 +215,12 @@ app.post("/novo-rso", async (req, res) => {
 
     await dbRun(`
       INSERT INTO relatorios
-      (nome_envio, prefixo, unidade, motorista, encarregado, terceiro, quarto, hora_inicio, hora_saida, horas_total, relato, material)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (usuario_id, nome_envio, prefixo, unidade, motorista, encarregado, terceiro, quarto, hora_inicio, hora_saida, horas_total, relato, material)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
-      nome_envio, prefixo, unidade, motorista, encarregado,
+      req.session.user.id,
+      req.session.user.nome,
+      prefixo, unidade, motorista, encarregado,
       terceiro || "Não informado", quarto || "Não informado",
       hora_inicio, hora_saida, horas_total, relato, material || "Nada apreendido"
     ]);
@@ -166,25 +232,22 @@ app.post("/novo-rso", async (req, res) => {
   }
 });
 
-app.get("/meus-rso", async (req, res) => {
-  const nome = String(req.query.nome || "").trim();
-  let relatorios = [];
-  let total = 0;
+app.get("/meus-rso", requireUser, async (req, res) => {
+  const relatorios = await dbAll(
+    "SELECT * FROM relatorios WHERE usuario_id = ? ORDER BY id DESC",
+    [req.session.user.id]
+  );
 
-  if (nome) {
-    relatorios = await dbAll(
-      "SELECT * FROM relatorios WHERE LOWER(nome_envio) = LOWER(?) ORDER BY id DESC",
-      [nome]
-    );
+  const soma = await dbGet(
+    "SELECT COALESCE(SUM(horas_total), 0) AS total FROM relatorios WHERE usuario_id = ? AND status = 'aprovado'",
+    [req.session.user.id]
+  );
 
-    const soma = await dbGet(
-      "SELECT COALESCE(SUM(horas_total), 0) AS total FROM relatorios WHERE LOWER(nome_envio) = LOWER(?) AND status = 'aprovado'",
-      [nome]
-    );
-    total = soma?.total || 0;
-  }
-
-  res.render("meus-rso", { nome, relatorios, total });
+  res.render("meus-rso", {
+    user: req.session.user,
+    relatorios,
+    total: soma?.total || 0
+  });
 });
 
 app.get("/manager/login", (req, res) => res.render("login", { erro: null }));
@@ -251,7 +314,7 @@ app.get("/manager/horas", requireManager, async (req, res) => {
     SELECT nome_envio, COUNT(*) AS total_rso, COALESCE(SUM(horas_total), 0) AS total_horas
     FROM relatorios
     WHERE status = 'aprovado'
-    GROUP BY LOWER(nome_envio)
+    GROUP BY usuario_id, nome_envio
     ORDER BY total_horas DESC
   `);
   res.render("horas", { usuarios, manager: req.session.manager });

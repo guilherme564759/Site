@@ -1,7 +1,7 @@
 {
-  "name": "sistema-rso-profissional",
-  "version": "2.0.0",
-  "description": "Sistema RSO profissional com manager, aprovação, meus RSOs e soma de horas.",
+  "name": "sistema-rso-login-policial",
+  "version": "3.0.0",
+  "description": "Sistema RSO com login policial, manager, aprovação e controle de horas.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

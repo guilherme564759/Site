@@ -12,7 +12,7 @@
     <img src="/logo.png" class="logo-img" onerror="this.outerHTML='<div class=&quot;logo-fallback&quot;>PM</div>'">
     <div>
       <h1>Meus Relatórios</h1>
-      <p>Consulta de RSO e horas aprovadas</p>
+      <p>Consulta individual de RSO e horas aprovadas</p>
     </div>
   </div>
   <a class="nav-link" href="/">Início</a>
@@ -22,51 +22,41 @@
   <section class="panel">
     <div class="panel-head">
       <div>
-        <span class="badge">CONSULTA</span>
-        <h2>Ver meus RSO</h2>
-        <p class="muted">Digite exatamente o mesmo nome usado ao enviar o relatório.</p>
+        <span class="badge">MEUS RSO</span>
+        <h2><%= user.nome %></h2>
+        <p class="muted">Aqui aparecem somente os relatórios enviados pela sua conta.</p>
       </div>
     </div>
 
-    <form class="form-grid" method="GET" action="/meus-rso">
-      <label class="full">
-        Nome de quem enviou:
-        <input name="nome" value="<%= nome %>" required placeholder="Ex: Guilherme Marshall">
-      </label>
-      <button class="btn-primary full" type="submit">Consultar relatórios</button>
-    </form>
-
-    <% if (nome) { %>
-      <div class="dashboard">
-        <div class="metric">
-          <span>Horas aprovadas</span>
-          <strong><%= formatarHoras(total) %></strong>
-        </div>
-        <div class="metric">
-          <span>Total de RSO</span>
-          <strong><%= relatorios.length %></strong>
-        </div>
+    <div class="dashboard">
+      <div class="metric">
+        <span>Horas aprovadas</span>
+        <strong><%= formatarHoras(total) %></strong>
       </div>
-
-      <% if (relatorios.length === 0) { %>
-        <div class="empty">Nenhum RSO encontrado para esse nome.</div>
-      <% } %>
-
-      <div class="cards">
-        <% relatorios.forEach(r => { %>
-          <article class="rso-card">
-            <div class="rso-top">
-              <strong>#<%= r.id %> - <%= r.unidade %></strong>
-              <span class="status <%= r.status %>"><%= r.status %></span>
-            </div>
-            <p><b>Viatura:</b> <%= r.prefixo %></p>
-            <p><b>Horário:</b> <%= r.hora_inicio %> até <%= r.hora_saida %></p>
-            <p><b>Horas:</b> <%= formatarHoras(r.horas_total) %></p>
-            <p class="preview"><%= r.relato.substring(0, 180) %><%= r.relato.length > 180 ? "..." : "" %></p>
-          </article>
-        <% }) %>
+      <div class="metric">
+        <span>Total de RSO</span>
+        <strong><%= relatorios.length %></strong>
       </div>
+    </div>
+
+    <% if (relatorios.length === 0) { %>
+      <div class="empty">Você ainda não enviou nenhum RSO.</div>
     <% } %>
+
+    <div class="cards">
+      <% relatorios.forEach(r => { %>
+        <article class="rso-card">
+          <div class="rso-top">
+            <strong>#<%= r.id %> - <%= r.unidade %></strong>
+            <span class="status <%= r.status %>"><%= r.status %></span>
+          </div>
+          <p><b>Viatura:</b> <%= r.prefixo %></p>
+          <p><b>Horário:</b> <%= r.hora_inicio %> até <%= r.hora_saida %></p>
+          <p><b>Horas:</b> <%= formatarHoras(r.horas_total) %></p>
+          <p class="preview"><%= r.relato.substring(0, 180) %><%= r.relato.length > 180 ? "..." : "" %></p>
+        </article>
+      <% }) %>
+    </div>
   </section>
 </main>
 </body>

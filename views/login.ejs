@@ -13,7 +13,7 @@
   <section class="hero-card">
     <span class="badge">MANAGER</span>
     <h2>Entrar no painel</h2>
-    <% if (erro) { %><div class="success"><%= erro %></div><% } %>
+    <% if (erro) { %><div class="error"><%= erro %></div><% } %>
     <form class="form-grid" method="POST" action="/manager/login">
       <label class="full">Usuário<input name="nome" required placeholder="Administrador"></label>
       <label class="full">Senha<input name="senha" type="password" required placeholder="admin123"></label>

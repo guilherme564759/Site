@@ -28,27 +28,24 @@
       </div>
     </div>
 
-    <form class="form-grid" method="POST" action="/novo-rso">
-      <label>
-        Nome de quem envia:
-        <input name="nome_envio" required placeholder="Ex: Guilherme Marshall">
-      </label>
+    <div class="user-box">Enviando como: <strong><%= user.nome %></strong></div>
 
+    <form class="form-grid" method="POST" action="/novo-rso">
       <label>
         Unidade:
         <select name="unidade" required>
           <option value="">Selecione</option>
-          <option>Radio-Patrulha</option>
+          <option>Radiopatrulha</option>
           <option>DPM</option>
           <option>FT</option>
           <option>BAEP</option>
           <option>CAEP</option>
           <option>ROTA</option>
           <option>ANCHIETA</option>
-          <option>HUMAITA</option>
+          <option>HUMAITÁ</option>
           <option>COE/GATE</option>
           <option>BPRV</option>
-          <option>Transito</option>
+          <option>Trânsito</option>
           <option>Outra</option>
         </select>
       </label>
