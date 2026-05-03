@@ -1,131 +1,69 @@
-:root {
-  --bg: #020c12;
-  --bg2: #04151f;
-  --panel: #0a2533;
-  --ocean: #062d3d;
-  --accent: #0b6b8a;
-  --green: #1faa59;
-  --text: #eef8fb;
-  --muted: #9fc0cc;
-  --danger: #d94848;
-  --success: #2fc26b;
-  --border: rgba(255,255,255,.12);
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: linear-gradient(135deg, var(--bg), #000);
-  color: var(--text);
-}
-
-/* HEADER */
-.topbar {
-  background: linear-gradient(90deg, #04151f, #062d3d);
-  border-bottom: 2px solid var(--accent);
-  padding: 15px 25px;
+.page {
+  padding: 35px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  background: var(--ocean);
-  display: flex;
-  align-items: center;
   justify-content: center;
+}
+
+.panel {
+  background: linear-gradient(145deg, #092f44, #061c2b);
+  border: 1px solid rgba(0, 174, 255, 0.25);
+  border-radius: 22px;
+  padding: 30px;
+  width: min(1100px, 100%);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin-top: 25px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   font-weight: bold;
+  color: #dff7ff;
+  text-transform: uppercase;
+  font-size: 14px;
 }
 
-/* NOVA LOGO */
-.logo-img {
-  width: 52px;
-  height: 52px;
-  object-fit: contain;
-}
-
-h1 {
-  font-size: 18px;
-  margin: 0;
-}
-
-.topbar p {
-  margin: 0;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-/* BOTÃO MANAGER */
-.nav-link {
-  text-decoration: none;
+input, select, textarea {
+  background: #02131f;
   color: white;
-  padding: 8px 14px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--border);
-}
-
-/* HERO */
-.hero {
-  height: 80vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.hero-card {
-  background: var(--panel);
-  padding: 40px;
-  border-radius: 20px;
-  text-align: center;
-  border: 1px solid var(--border);
-  width: 500px;
-}
-
-.badge {
-  background: rgba(11,107,138,0.2);
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  color: #9decff;
-}
-
-.hero-card h2 {
-  font-size: 28px;
-  margin: 15px 0;
-}
-
-.hero-card p {
-  color: var(--muted);
-  margin-bottom: 20px;
-}
-
-/* BOTÃO INICIAR */
-.btn-primary {
-  background: var(--green);
-  padding: 12px 25px;
+  border: 1px solid #0b6b8a;
   border-radius: 10px;
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-  display: inline-block;
-  transition: 0.2s;
+  padding: 13px;
+  font-size: 15px;
+  outline: none;
 }
 
-.btn-primary:hover {
-  background: #168f47;
-  transform: scale(1.05);
+input:focus, select:focus, textarea:focus {
+  border-color: #16b8e8;
+  box-shadow: 0 0 10px rgba(22,184,232,0.35);
+}
+
+textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.success {
+  background: rgba(31,170,89,0.15);
+  border: 1px solid #1faa59;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 15px;
+}
+
+@media (max-width: 800px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 }
