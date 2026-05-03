@@ -10,29 +10,56 @@ const PORT = process.env.PORT || 3000;
 const MANAGER_PASSWORD = process.env.MANAGER_PASSWORD || "admin123";
 
 const dataDir = path.join(__dirname, "data");
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
+if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
 const dbPath = path.join(dataDir, "rso.db");
 const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error("Erro ao abrir banco SQLite:", err.message);
-  } else {
-    console.log("Banco SQLite conectado:", dbPath);
-  }
+  if (err) console.error("Erro ao abrir SQLite:", err.message);
+  else console.log("Banco SQLite conectado:", dbPath);
 });
+
+function calcularHoras(horaInicio, horaSaida) {
+  if (!horaInicio || !horaSaida) return 0;
+
+  const normalizar = (valor) => {
+    const txt = String(valor).trim().toLowerCase().replace("h", ":");
+    const partes = txt.split(":");
+    const h = Number(partes[0]);
+    const m = Number(partes[1] || 0);
+    if (Number.isNaN(h) || Number.isNaN(m)) return null;
+    return h * 60 + m;
+  };
+
+  let inicio = normalizar(horaInicio);
+  let saida = normalizar(horaSaida);
+  if (inicio === null || saida === null) return 0;
+
+  if (saida < inicio) saida += 24 * 60;
+  const minutos = Math.max(0, saida - inicio);
+  return Number((minutos / 60).toFixed(2));
+}
+
+function formatarHoras(valor) {
+  const totalMin = Math.round(Number(valor || 0) * 60);
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  return `${h}h ${String(m).padStart(2, "0")}min`;
+}
 
 db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS relatorios (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nome_envio TEXT NOT NULL,
       prefixo TEXT NOT NULL,
       unidade TEXT NOT NULL,
-      equipe TEXT NOT NULL,
-      bancos TEXT,
-      local TEXT,
-      horario TEXT,
+      motorista TEXT,
+      encarregado TEXT,
+      terceiro TEXT,
+      quarto TEXT,
+      hora_inicio TEXT,
+      hora_saida TEXT,
+      horas_total REAL DEFAULT 0,
       relato TEXT NOT NULL,
       material TEXT,
       status TEXT DEFAULT 'pendente',
@@ -50,6 +77,29 @@ db.serialize(() => {
       criado_em TEXT DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  // Migração simples caso venha de versão antiga
+  const cols = [
+    ["nome_envio", "TEXT DEFAULT 'Não informado'"],
+    ["motorista", "TEXT"],
+    ["encarregado", "TEXT"],
+    ["terceiro", "TEXT"],
+    ["quarto", "TEXT"],
+    ["hora_inicio", "TEXT"],
+    ["hora_saida", "TEXT"],
+    ["horas_total", "REAL DEFAULT 0"]
+  ];
+
+  db.all("PRAGMA table_info(relatorios)", (err, rows) => {
+    if (!err && rows) {
+      const existentes = rows.map(r => r.name);
+      cols.forEach(([nome, tipo]) => {
+        if (!existentes.includes(nome)) {
+          db.run(`ALTER TABLE relatorios ADD COLUMN ${nome} ${tipo}`);
+        }
+      });
+    }
+  });
 
   db.get("SELECT COUNT(*) AS total FROM permissoes", (err, row) => {
     if (!err && row && row.total === 0) {
@@ -75,44 +125,66 @@ function requireManager(req, res, next) {
 }
 
 function dbAll(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => err ? reject(err) : resolve(rows));
-  });
+  return new Promise((resolve, reject) => db.all(sql, params, (err, rows) => err ? reject(err) : resolve(rows)));
 }
-
 function dbGet(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.get(sql, params, (err, row) => err ? reject(err) : resolve(row));
-  });
+  return new Promise((resolve, reject) => db.get(sql, params, (err, row) => err ? reject(err) : resolve(row)));
 }
-
 function dbRun(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.run(sql, params, function(err) {
-      err ? reject(err) : resolve(this);
-    });
-  });
+  return new Promise((resolve, reject) => db.run(sql, params, function(err) { err ? reject(err) : resolve(this); }));
 }
 
-app.get("/", (req, res) => res.render("home"));
+app.locals.formatarHoras = formatarHoras;
 
-app.get("/novo-rso", (req, res) => res.render("novo-rso", { sucesso: false }));
+app.get("/", (req, res) => res.render("home", { enviado: req.query.enviado === "1" }));
+
+app.get("/novo-rso", (req, res) => res.render("novo-rso"));
 
 app.post("/novo-rso", async (req, res) => {
   try {
-    const { prefixo, unidade, equipe, bancos, local, horario, relato, material } = req.body;
+    const {
+      nome_envio, prefixo, unidade, motorista, encarregado,
+      terceiro, quarto, hora_inicio, hora_saida, relato, material
+    } = req.body;
+
+    const horas_total = calcularHoras(hora_inicio, hora_saida);
 
     await dbRun(`
       INSERT INTO relatorios
-      (prefixo, unidade, equipe, bancos, local, horario, relato, material)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `, [prefixo, unidade, equipe, bancos, local, horario, relato, material]);
+      (nome_envio, prefixo, unidade, motorista, encarregado, terceiro, quarto, hora_inicio, hora_saida, horas_total, relato, material)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+      nome_envio, prefixo, unidade, motorista, encarregado,
+      terceiro || "Não informado", quarto || "Não informado",
+      hora_inicio, hora_saida, horas_total, relato, material || "Nada apreendido"
+    ]);
 
-    res.render("novo-rso", { sucesso: true });
+    res.redirect("/?enviado=1");
   } catch (err) {
     console.error(err);
     res.status(500).send("Erro ao enviar RSO.");
   }
+});
+
+app.get("/meus-rso", async (req, res) => {
+  const nome = String(req.query.nome || "").trim();
+  let relatorios = [];
+  let total = 0;
+
+  if (nome) {
+    relatorios = await dbAll(
+      "SELECT * FROM relatorios WHERE LOWER(nome_envio) = LOWER(?) ORDER BY id DESC",
+      [nome]
+    );
+
+    const soma = await dbGet(
+      "SELECT COALESCE(SUM(horas_total), 0) AS total FROM relatorios WHERE LOWER(nome_envio) = LOWER(?) AND status = 'aprovado'",
+      [nome]
+    );
+    total = soma?.total || 0;
+  }
+
+  res.render("meus-rso", { nome, relatorios, total });
 });
 
 app.get("/manager/login", (req, res) => res.render("login", { erro: null }));
@@ -137,7 +209,15 @@ app.get("/manager/logout", (req, res) => req.session.destroy(() => res.redirect(
 app.get("/manager", requireManager, async (req, res) => {
   const status = req.query.status || "pendente";
   const relatorios = await dbAll("SELECT * FROM relatorios WHERE status = ? ORDER BY id DESC", [status]);
-  res.render("manager", { relatorios, status, manager: req.session.manager });
+
+  const cards = {
+    pendentes: (await dbGet("SELECT COUNT(*) AS total FROM relatorios WHERE status='pendente'"))?.total || 0,
+    aprovados: (await dbGet("SELECT COUNT(*) AS total FROM relatorios WHERE status='aprovado'"))?.total || 0,
+    recusados: (await dbGet("SELECT COUNT(*) AS total FROM relatorios WHERE status='recusado'"))?.total || 0,
+    horas: (await dbGet("SELECT COALESCE(SUM(horas_total), 0) AS total FROM relatorios WHERE status='aprovado'"))?.total || 0
+  };
+
+  res.render("manager", { relatorios, status, manager: req.session.manager, cards });
 });
 
 app.get("/manager/rso/:id", requireManager, async (req, res) => {
@@ -164,6 +244,17 @@ app.post("/manager/rso/:id/recusar", requireManager, async (req, res) => {
   `, [req.session.manager.nome, req.body.observacao || "", req.params.id]);
 
   res.redirect("/manager?status=pendente");
+});
+
+app.get("/manager/horas", requireManager, async (req, res) => {
+  const usuarios = await dbAll(`
+    SELECT nome_envio, COUNT(*) AS total_rso, COALESCE(SUM(horas_total), 0) AS total_horas
+    FROM relatorios
+    WHERE status = 'aprovado'
+    GROUP BY LOWER(nome_envio)
+    ORDER BY total_horas DESC
+  `);
+  res.render("horas", { usuarios, manager: req.session.manager });
 });
 
 app.get("/manager/permissoes", requireManager, async (req, res) => {

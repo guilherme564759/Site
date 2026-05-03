@@ -1,1 +1,58 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Ver RSO</title><link rel="stylesheet" href="/style.css"></head><body><header class="topbar"><div class="brand"><div class="logo">PM</div><div><h1>Visualização do RSO</h1><p>Análise completa antes da aprovação</p></div></div><a class="nav-link" href="/manager">Voltar</a></header><main class="page"><section class="report"><div class="report-header"><div><span class="badge">RELATÓRIO #<%= rso.id %></span><h2>Relatório de Serviço Operacional</h2><p>Polícia Militar do Estado de São Paulo - SSP</p></div><span class="status <%= rso.status %>"><%= rso.status %></span></div><div class="report-grid"><div><b>Prefixo da Viatura</b><span><%= rso.prefixo %></span></div><div><b>Unidade</b><span><%= rso.unidade %></span></div><div><b>Equipe</b><span><%= rso.equipe %></span></div><div><b>Bancos</b><span><%= rso.bancos || "Não informado" %></span></div><div><b>Local</b><span><%= rso.local || "Não informado" %></span></div><div><b>Horário</b><span><%= rso.horario || "Não informado" %></span></div><div><b>Criado em</b><span><%= rso.criado_em %></span></div><div><b>Avaliado por</b><span><%= rso.aprovado_por || "Ainda não avaliado" %></span></div></div><div class="text-block"><h3>Relato dos Fatos</h3><p><%= rso.relato %></p></div><div class="text-block"><h3>Material Apreendido</h3><p><%= rso.material || "Nada informado." %></p></div><% if (rso.observacao_manager) { %><div class="text-block"><h3>Observação do Manager</h3><p><%= rso.observacao_manager %></p></div><% } %><% if (rso.status === "pendente") { %><form class="decision" method="POST"><label class="full">Observação do Manager<textarea name="observacao" placeholder="Opcional."></textarea></label><div class="decision-buttons"><button formaction="/manager/rso/<%= rso.id %>/aprovar" class="btn-approve" type="submit">Aprovar RSO</button><button formaction="/manager/rso/<%= rso.id %>/recusar" class="btn-deny" type="submit">Recusar RSO</button></div></form><% } %></section></main></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Visualizar RSO</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <img src="/logo.png" class="logo-img" onerror="this.outerHTML='<div class=&quot;logo-fallback&quot;>PM</div>'">
+    <div><h1>Visualização do RSO</h1><p>Análise completa antes da aprovação</p></div>
+  </div>
+  <a class="nav-link" href="/manager">Voltar</a>
+</header>
+
+<main class="page">
+  <section class="report">
+    <div class="report-header">
+      <div>
+        <span class="badge">RELATÓRIO #<%= rso.id %></span>
+        <h2>Relatório de Serviço Operacional</h2>
+        <p class="muted">Polícia Militar do Estado de São Paulo - SSP</p>
+      </div>
+      <span class="status <%= rso.status %>"><%= rso.status %></span>
+    </div>
+
+    <div class="report-grid">
+      <div><b>Enviado por</b><span><%= rso.nome_envio %></span></div>
+      <div><b>Unidade</b><span><%= rso.unidade %></span></div>
+      <div><b>Prefixo da Viatura</b><span><%= rso.prefixo %></span></div>
+      <div><b>Motorista</b><span><%= rso.motorista || "Não informado" %></span></div>
+      <div><b>Encarregado</b><span><%= rso.encarregado || "Não informado" %></span></div>
+      <div><b>Terceiro Homem</b><span><%= rso.terceiro || "Não informado" %></span></div>
+      <div><b>Quarto Homem</b><span><%= rso.quarto || "Não informado" %></span></div>
+      <div><b>Horário</b><span><%= rso.hora_inicio %> até <%= rso.hora_saida %></span></div>
+      <div><b>Total de horas</b><span><%= formatarHoras(rso.horas_total) %></span></div>
+      <div><b>Avaliado por</b><span><%= rso.aprovado_por || "Ainda não avaliado" %></span></div>
+    </div>
+
+    <div class="text-block"><h3>Relatório do serviço</h3><p><%= rso.relato %></p></div>
+    <div class="text-block"><h3>Itens apreendidos</h3><p><%= rso.material || "Nada apreendido." %></p></div>
+
+    <% if (rso.observacao_manager) { %>
+      <div class="text-block"><h3>Observação do Manager</h3><p><%= rso.observacao_manager %></p></div>
+    <% } %>
+
+    <% if (rso.status === "pendente") { %>
+      <form class="decision" method="POST">
+        <label class="full">Observação do Manager
+          <textarea name="observacao" placeholder="Opcional: escreva alguma observação sobre a aprovação/recusa."></textarea>
+        </label>
+        <div class="decision-buttons">
+          <button formaction="/manager/rso/<%= rso.id %>/aprovar" class="btn-approve" type="submit">Aprovar RSO</button>
+          <button formaction="/manager/rso/<%= rso.id %>/recusar" class="btn-deny" type="submit">Recusar RSO</button>
+        </div>
+      </form>
+    <% } %>
+  </section>
+</main>
+</body>
+</html>

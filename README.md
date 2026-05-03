@@ -1,23 +1,26 @@
-# Sistema RSO corrigido para Render
+# Sistema RSO Profissional
 
-## Login padrão
+## Login padrão do Manager
 Usuário: `Administrador`
 Senha: `admin123`
 
-## Render
-Build Command:
+## Novidades
+- Botão `Ver meus RSO` ao lado de `[+ Iniciar RSO]`
+- Após enviar RSO, volta para a tela inicial
+- Painel Manager mais profissional e arredondado
+- Aba de aprovados, recusados e pendentes
+- Cálculo de horas pelo horário de início e saída
+- Tela de horas somadas por quem enviou o relatório
+- Consulta pública dos próprios RSOs por nome
+
+## Rodar
 ```bash
 npm install
+npm start
 ```
 
+## Railway / Render
 Start Command:
 ```bash
 npm start
 ```
-
-## Correção feita
-O sistema agora cria automaticamente a pasta `data` antes de abrir o banco SQLite, corrigindo o erro:
-
-`SQLITE_CANTOPEN: unable to open database file`
-
-Também usa `0.0.0.0` no `app.listen`, melhor para hospedagem.

@@ -7,36 +7,35 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-
 <header class="topbar">
   <div class="brand">
-    <img src="/logo.png" class="logo-img">
+    <img src="/logo.png" class="logo-img" onerror="this.outerHTML='<div class=&quot;logo-fallback&quot;>PM</div>'">
     <div>
       <h1>Polícia Militar do Estado de São Paulo - SSP</h1>
-      <p>Sistema de Relatório de Serviço Operacional</p>
+      <p>Preenchimento de Relatório de Serviço Operacional</p>
     </div>
   </div>
   <a class="nav-link" href="/">Início</a>
 </header>
 
 <main class="page">
-  <section class="panel wide">
-    <h2>Novo RSO</h2>
-    <p class="muted">Preencha os dados operacionais abaixo.</p>
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <span class="badge">NOVO RSO</span>
+        <h2>Preenchimento operacional</h2>
+        <p class="muted">Após enviar, você voltará automaticamente para a tela inicial.</p>
+      </div>
+    </div>
 
-    <% if (sucesso) { %>
-      <div class="success">✅ RSO enviado com sucesso para análise do Manager.</div>
-    <% } %>
-
-    <form class="form-grid" method="POST" action="/novo-rso" id="rsoForm">
-
+    <form class="form-grid" method="POST" action="/novo-rso">
       <label>
-        PREFIXO DA VIATURA:
-        <input name="prefixo" required placeholder="Ex: ROTA-011">
+        Nome de quem envia:
+        <input name="nome_envio" required placeholder="Ex: Guilherme Marshall">
       </label>
 
       <label>
-        UNIDADE:
+        Unidade:
         <select name="unidade" required>
           <option value="">Selecione</option>
           <option>ROTA</option>
@@ -50,33 +49,38 @@
       </label>
 
       <label>
+        Prefixo da viatura:
+        <input name="prefixo" required placeholder="Ex: ROTA-011">
+      </label>
+
+      <label>
         Motorista:
-        <input id="motorista" required placeholder="Nome do motorista">
+        <input name="motorista" required placeholder="Nome do motorista">
       </label>
 
       <label>
         Encarregado:
-        <input id="encarregado" required placeholder="Nome do encarregado">
+        <input name="encarregado" required placeholder="Nome do encarregado">
       </label>
 
       <label>
-        Terceiro Homem:
-        <input id="terceiro" placeholder="Nome do terceiro homem">
+        Terceiro homem:
+        <input name="terceiro" placeholder="Nome do terceiro homem">
       </label>
 
       <label>
-        Quarto Homem:
-        <input id="quarto" placeholder="Nome do quarto homem">
+        Quarto homem:
+        <input name="quarto" placeholder="Nome do quarto homem">
       </label>
 
       <label>
         Hora de início:
-        <input id="horaInicio" required placeholder="Ex: 20h00">
+        <input name="hora_inicio" required placeholder="Ex: 20:00">
       </label>
 
       <label>
         Hora de saída:
-        <input id="horaSaida" required placeholder="Ex: 23h30">
+        <input name="hora_saida" required placeholder="Ex: 23:30">
       </label>
 
       <label class="full">
@@ -89,35 +93,9 @@
         <textarea name="material" placeholder="Informe os itens apreendidos ou escreva: Nada apreendido."></textarea>
       </label>
 
-      <input type="hidden" name="equipe" id="equipe">
-      <input type="hidden" name="bancos" id="bancos">
-      <input type="hidden" name="horario" id="horario">
-      <input type="hidden" name="local" value="Não informado">
-
       <button class="btn-primary full" type="submit">Enviar RSO para análise</button>
     </form>
   </section>
 </main>
-
-<script>
-document.getElementById("rsoForm").addEventListener("submit", function () {
-  const motorista = document.getElementById("motorista").value;
-  const encarregado = document.getElementById("encarregado").value;
-  const terceiro = document.getElementById("terceiro").value || "Não informado";
-  const quarto = document.getElementById("quarto").value || "Não informado";
-  const inicio = document.getElementById("horaInicio").value;
-  const saida = document.getElementById("horaSaida").value;
-
-  document.getElementById("equipe").value =
-    `Motorista: ${motorista} | Encarregado: ${encarregado} | Terceiro Homem: ${terceiro} | Quarto Homem: ${quarto}`;
-
-  document.getElementById("bancos").value =
-    `Motorista: ${motorista} | Encarregado: ${encarregado} | Terceiro Homem: ${terceiro} | Quarto Homem: ${quarto}`;
-
-  document.getElementById("horario").value =
-    `Início: ${inicio} | Saída: ${saida}`;
-});
-</script>
-
 </body>
 </html>
