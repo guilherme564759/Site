@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSO - PMESP</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">PM</div>
+    <div>
+      <h1>Painel Manager - RSO</h1>
+      <p>Logado como <%= manager.nome %></p>
+    </div>
+  </div>
+  <nav class="nav">
+    <a href="/manager?status=pendente">Pendentes</a>
+    <a href="/manager?status=aprovado">Aprovados</a>
+    <a href="/manager?status=recusado">Recusados</a>
+    <a href="/manager/permissoes">Permissões</a>
+    <a href="/manager/logout">Sair</a>
+  </nav>
+</header>
+
+<main class="page">
+  <section class="panel wide">
+    <div class="section-title">
+      <div>
+        <h2>Relatórios <%= status %></h2>
+        <p class="muted">Clique em “Ver relatório” para analisar antes de aprovar.</p>
+      </div>
+      <span class="counter"><%= relatorios.length %></span>
+    </div>
+
+    <% if (relatorios.length === 0) { %>
+      <div class="empty">Nenhum relatório encontrado.</div>
+    <% } %>
+
+    <div class="cards">
+      <% relatorios.forEach(r => { %>
+        <article class="rso-card">
+          <div class="rso-top">
+            <strong>#<%= r.id %> - <%= r.unidade %></strong>
+            <span class="status <%= r.status %>"><%= r.status %></span>
+          </div>
+          <p><b>Viatura:</b> <%= r.prefixo %></p>
+          <p><b>Equipe:</b> <%= r.equipe %></p>
+          <p><b>Data:</b> <%= r.criado_em %></p>
+          <p class="preview"><%= r.relato.substring(0, 150) %><%= r.relato.length > 150 ? "..." : "" %></p>
+          <a class="btn-secondary" href="/manager/rso/<%= r.id %>">Ver relatório</a>
+        </article>
+      <% }) %>
+    </div>
+  </section>
+</main>
+
+</body>
+</html>
