@@ -1,1 +1,123 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Novo RSO</title><link rel="stylesheet" href="/style.css"></head><body><header class="topbar"><div class="brand"><div class="logo">PM</div><div><h1>Polícia Militar do Estado de São Paulo - SSP</h1><p>Preenchimento de RSO</p></div></div><a class="nav-link" href="/">Início</a></header><main class="page"><section class="panel wide"><h2>Novo RSO</h2><p class="muted">Preencha todos os dados operacionais com atenção.</p><% if (sucesso) { %><div class="success">✅ RSO enviado com sucesso para análise do Manager.</div><% } %><form class="form-grid" method="POST" action="/novo-rso"><label>Prefixo da Viatura<input name="prefixo" required placeholder="Ex: ROTA-011"></label><label>Unidade<select name="unidade" required><option value="">Selecione</option><option>ROTA</option><option>BAEP</option><option>FT</option><option>Radiopatrulha</option><option>Trânsito</option><option>GCM</option><option>Outra</option></select></label><label>Equipe / Policiais na Viatura<input name="equipe" required placeholder="Ex: Cap. Guilherme / Cb. Silva / Sd. Santos"></label><label>Quem estava nos bancos<input name="bancos" placeholder="Ex: Motorista: Cb Silva | Encarregado: Cap Guilherme | 3º Banco: Sd Santos"></label><label>Local da Ocorrência<input name="local" placeholder="Ex: Av. Paulista, Centro"></label><label>Horário<input name="horario" placeholder="Ex: 22h30"></label><label class="full">Relato dos Fatos<textarea name="relato" required placeholder="Descreva de forma detalhada o ocorrido..."></textarea></label><label class="full">Material Apreendido<textarea name="material" placeholder="Informe materiais ou escreva 'Nada apreendido'."></textarea></label><button class="btn-primary full" type="submit">Enviar RSO para análise</button></form></section></main></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novo RSO</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <img src="/logo.png" class="logo-img">
+    <div>
+      <h1>Polícia Militar do Estado de São Paulo - SSP</h1>
+      <p>Sistema de Relatório de Serviço Operacional</p>
+    </div>
+  </div>
+  <a class="nav-link" href="/">Início</a>
+</header>
+
+<main class="page">
+  <section class="panel wide">
+    <h2>Novo RSO</h2>
+    <p class="muted">Preencha os dados operacionais abaixo.</p>
+
+    <% if (sucesso) { %>
+      <div class="success">✅ RSO enviado com sucesso para análise do Manager.</div>
+    <% } %>
+
+    <form class="form-grid" method="POST" action="/novo-rso" id="rsoForm">
+
+      <label>
+        PREFIXO DA VIATURA:
+        <input name="prefixo" required placeholder="Ex: ROTA-011">
+      </label>
+
+      <label>
+        UNIDADE:
+        <select name="unidade" required>
+          <option value="">Selecione</option>
+          <option>ROTA</option>
+          <option>BAEP</option>
+          <option>FT</option>
+          <option>Radiopatrulha</option>
+          <option>Trânsito</option>
+          <option>GCM</option>
+          <option>Outra</option>
+        </select>
+      </label>
+
+      <label>
+        Motorista:
+        <input id="motorista" required placeholder="Nome do motorista">
+      </label>
+
+      <label>
+        Encarregado:
+        <input id="encarregado" required placeholder="Nome do encarregado">
+      </label>
+
+      <label>
+        Terceiro Homem:
+        <input id="terceiro" placeholder="Nome do terceiro homem">
+      </label>
+
+      <label>
+        Quarto Homem:
+        <input id="quarto" placeholder="Nome do quarto homem">
+      </label>
+
+      <label>
+        Hora de início:
+        <input id="horaInicio" required placeholder="Ex: 20h00">
+      </label>
+
+      <label>
+        Hora de saída:
+        <input id="horaSaida" required placeholder="Ex: 23h30">
+      </label>
+
+      <label class="full">
+        Relatório do serviço:
+        <textarea name="relato" required placeholder="Descreva o serviço realizado, ocorrências, abordagens e demais informações..."></textarea>
+      </label>
+
+      <label class="full">
+        Itens apreendidos:
+        <textarea name="material" placeholder="Informe os itens apreendidos ou escreva: Nada apreendido."></textarea>
+      </label>
+
+      <input type="hidden" name="equipe" id="equipe">
+      <input type="hidden" name="bancos" id="bancos">
+      <input type="hidden" name="horario" id="horario">
+      <input type="hidden" name="local" value="Não informado">
+
+      <button class="btn-primary full" type="submit">Enviar RSO para análise</button>
+    </form>
+  </section>
+</main>
+
+<script>
+document.getElementById("rsoForm").addEventListener("submit", function () {
+  const motorista = document.getElementById("motorista").value;
+  const encarregado = document.getElementById("encarregado").value;
+  const terceiro = document.getElementById("terceiro").value || "Não informado";
+  const quarto = document.getElementById("quarto").value || "Não informado";
+  const inicio = document.getElementById("horaInicio").value;
+  const saida = document.getElementById("horaSaida").value;
+
+  document.getElementById("equipe").value =
+    `Motorista: ${motorista} | Encarregado: ${encarregado} | Terceiro Homem: ${terceiro} | Quarto Homem: ${quarto}`;
+
+  document.getElementById("bancos").value =
+    `Motorista: ${motorista} | Encarregado: ${encarregado} | Terceiro Homem: ${terceiro} | Quarto Homem: ${quarto}`;
+
+  document.getElementById("horario").value =
+    `Início: ${inicio} | Saída: ${saida}`;
+});
+</script>
+
+</body>
+</html>
