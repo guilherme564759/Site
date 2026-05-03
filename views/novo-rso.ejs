@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novo RSO</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <img src="/logo.png" class="logo-img" onerror="this.outerHTML='<div class=&quot;logo-fallback&quot;>PM</div>'">
+    <div>
+      <h1>Polícia Militar do Estado de São Paulo - SSP</h1>
+      <p>Preenchimento de Relatório de Serviço Operacional</p>
+    </div>
+  </div>
+  <a class="nav-link" href="/">Início</a>
+</header>
+
+<main class="page">
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <span class="badge">NOVO RSO</span>
+        <h2>Preenchimento operacional</h2>
+        <p class="muted">Após enviar, você voltará automaticamente para a tela inicial.</p>
+      </div>
+    </div>
+
+    <div class="user-box">Enviando como: <strong><%= user.nome %></strong></div>
+
+    <form class="form-grid" method="POST" action="/novo-rso">
+      <label>
+        Unidade:
+        <select name="unidade" required>
+          <option value="">Selecione</option>
+          <option>Radiopatrulha</option>
+          <option>DPM</option>
+          <option>FT</option>
+          <option>BAEP</option>
+          <option>CAEP</option>
+          <option>ROTA</option>
+          <option>ANCHIETA</option>
+          <option>HUMAITÁ</option>
+          <option>COE/GATE</option>
+          <option>BPRV</option>
+          <option>Trânsito</option>
+          <option>Outra</option>
+        </select>
+      </label>
+
+      <label>
+        Prefixo da viatura:
+        <input name="prefixo" required placeholder="Ex: ROTA-011">
+      </label>
+
+      <label>
+        Motorista:
+        <input name="motorista" required placeholder="Nome do motorista">
+      </label>
+
+      <label>
+        Encarregado:
+        <input name="encarregado" required placeholder="Nome do encarregado">
+      </label>
+
+      <label>
+        Terceiro homem:
+        <input name="terceiro" placeholder="Nome do terceiro homem">
+      </label>
+
+      <label>
+        Quarto homem:
+        <input name="quarto" placeholder="Nome do quarto homem">
+      </label>
+
+      <label>
+        Hora de início:
+        <input name="hora_inicio" required placeholder="Ex: 20:00">
+      </label>
+
+      <label>
+        Hora de saída:
+        <input name="hora_saida" required placeholder="Ex: 23:30">
+      </label>
+
+      <label class="full">
+        Relatório do serviço:
+        <textarea name="relato" required placeholder="Descreva o serviço realizado, ocorrências, abordagens e demais informações..."></textarea>
+      </label>
+
+      <label class="full">
+        Itens apreendidos:
+        <textarea name="material" placeholder="Informe os itens apreendidos ou escreva: Nada apreendido."></textarea>
+      </label>
+
+      <button class="btn-primary full" type="submit">Enviar RSO para análise</button>
+    </form>
+  </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Manager RSO</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <img src="/logo.png" class="logo-img" onerror="this.outerHTML='<div class=&quot;logo-fallback&quot;>PM</div>'">
+    <div><h1>Painel Manager - RSO</h1><p>Logado como <%= manager.nome %></p></div>
+  </div>
+  <nav class="nav">
+    <a class="pill-link" href="/manager?status=pendente">Pendentes</a>
+    <a class="pill-link" href="/manager?status=aprovado">Aprovados</a>
+    <a class="pill-link" href="/manager?status=recusado">Recusados</a>
+    <a class="pill-link" href="/manager/horas">Horas</a>
+    <a class="pill-link" href="/manager/permissoes">Permissões</a>
+    <a class="pill-link" href="/manager/logout">Sair</a>
+  </nav>
+</header>
+
+<main class="page">
+  <section class="panel">
+    <div class="section-title">
+      <div>
+        <span class="badge">ADMINISTRAÇÃO</span>
+        <h2>Relatórios <%= status %></h2>
+        <p class="muted">Abra o relatório para visualizar todos os dados antes de aprovar.</p>
+      </div>
+    </div>
+
+    <div class="dashboard">
+      <div class="metric"><span>Pendentes</span><strong><%= cards.pendentes %></strong></div>
+      <div class="metric"><span>Aprovados</span><strong><%= cards.aprovados %></strong></div>
+      <div class="metric"><span>Recusados</span><strong><%= cards.recusados %></strong></div>
+      <div class="metric"><span>Horas aprovadas</span><strong><%= formatarHoras(cards.horas) %></strong></div>
+    </div>
+
+    <% if (relatorios.length === 0) { %><div class="empty">Nenhum relatório encontrado.</div><% } %>
+
+    <div class="cards">
+      <% relatorios.forEach(r => { %>
+        <article class="rso-card">
+          <div class="rso-top">
+            <strong>#<%= r.id %> - <%= r.unidade %></strong>
+            <span class="status <%= r.status %>"><%= r.status %></span>
+          </div>
+          <p><b>Enviado por:</b> <%= r.nome_envio %></p>
+          <p><b>Viatura:</b> <%= r.prefixo %></p>
+          <p><b>Horário:</b> <%= r.hora_inicio %> até <%= r.hora_saida %> • <%= formatarHoras(r.horas_total) %></p>
+          <p class="preview"><%= r.relato.substring(0, 160) %><%= r.relato.length > 160 ? "..." : "" %></p>
+          <a class="btn-secondary" href="/manager/rso/<%= r.id %>">Ver relatório</a>
+        </article>
+      <% }) %>
+    </div>
+  </section>
+</main>
+</body>
+</html>
